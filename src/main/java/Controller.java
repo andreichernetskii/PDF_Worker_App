@@ -1,6 +1,7 @@
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -28,8 +29,8 @@ public class Controller {
     @FXML
     private Button CloseButton;
 
-    @FXML
-    private TextField FilesPathField;
+//    @FXML
+//    private TextField FilesPathField;
 
     @FXML
     private Button StartButton;
@@ -42,16 +43,19 @@ public class Controller {
 
     private List<File> fileList;
     private String savePath;
+    @FXML
+    private ComboBox<File> comboBox;
 
     @FXML
     void initialize() {
         assert BrowseFilesButton != null : "fx:id=\"BrowseFilesButton\" was not injected: check your FXML file 'sample.fxml'.";
         assert BrowseSavePathButton != null : "fx:id=\"BrowseSavePathButton\" was not injected: check your FXML file 'sample.fxml'.";
         assert CloseButton != null : "fx:id=\"CloseButton\" was not injected: check your FXML file 'sample.fxml'.";
-        assert FilesPathField != null : "fx:id=\"FilesPathField\" was not injected: check your FXML file 'sample.fxml'.";
+//        assert FilesPathField != null : "fx:id=\"FilesPathField\" was not injected: check your FXML file 'sample.fxml'.";
         assert SavePathField != null : "fx:id=\"SavePathField\" was not injected: check your FXML file 'sample.fxml'.";
         assert StartButton != null : "fx:id=\"StartButton\" was not injected: check your FXML file 'sample.fxml'.";
         assert statusLabel != null : "fx:id=\"statusLabel\" was not injected: check your FXML file 'sample.fxml'.";
+        assert comboBox != null : "fx:id=\"ComboBox\" was not injected: check your FXML file 'sample.fxml'.";
     }
 
     @FXML
@@ -63,12 +67,21 @@ public class Controller {
     @FXML
     private void openFile() {
         Stage stage = (Stage)BrowseFilesButton.getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+//        FileChooser fileChooser = new FileChooser();
+//        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+//        fileChooser.setTitle("Please choose the file(-s)");
+//        fileChooser.getExtensionFilters().add(extFilter);
+//        fileList = fileChooser.showOpenMultipleDialog(stage);
+
+        ModificatedFileChooser fileChooser = new ModificatedFileChooser();
+        fileChooser.setExtensionFilter("PDF files (*.pdf)", "*.pdf");
         fileChooser.setTitle("Please choose the file(-s)");
-        fileChooser.getExtensionFilters().add(extFilter);
         fileList = fileChooser.showOpenMultipleDialog(stage);
-        if (fileList != null) FilesPathField.appendText(fileList.get(0).getAbsolutePath());
+
+        if (fileList != null) {
+            comboBox.getItems().addAll(fileList);
+            addEvent();
+        }
     }
 
     @FXML
@@ -95,5 +108,13 @@ public class Controller {
             statusLabel.setText("Error. You have nothing selected");
             statusLabel.setVisible(true);
         }
+    }
+
+    private void addEvent() {
+        comboBox.setOnAction(event -> {
+            File selectedElement = comboBox.getSelectionModel().getSelectedItem();
+            comboBox.getItems().remove(selectedElement);
+            fileList.remove(selectedElement);
+        });
     }
 }
