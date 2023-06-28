@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import javafx.scene.control.Label;
+import java.awt.*;
 
 public class PDFWorker {
     public void pdfMerge(List<File> list, String path, Label statusLabel) {
@@ -17,6 +18,7 @@ public class PDFWorker {
             pdfMergerUtility.mergeDocuments();
             statusLabel.setText("Done!");
             statusLabel.setVisible(true);
+            callFileManager(fileName);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -27,5 +29,15 @@ public class PDFWorker {
         Path path = Paths.get(filePath + fileName + fileType);
         if (Files.notExists(path)) return filePath + fileName + fileType;
         else return fileNaming(filePath, fileName + 1, fileType);
+    }
+
+    private void callFileManager(String filePath) {
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+            File file = new File(filePath);
+            desktop.browseFileDirectory(file);
+        } else {
+            System.out.println("Browse file directory action is not supported!");
+        }
     }
 }

@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        Scene scene = new Scene(root, 408, 237);
+        Scene scene = new Scene(root, 424, 237);
         stage.setTitle("Merge PDF");
         stage.setScene(scene);
         stage.setResizable(false);

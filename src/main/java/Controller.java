@@ -2,48 +2,45 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller {
-
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
-
     @FXML
     private Button BrowseFilesButton;
-
     @FXML
     private Button BrowseSavePathButton;
-
     @FXML
     private Button CloseButton;
-
     @FXML
     private Button StartButton;
-
     @FXML
     private TextField SavePathField;
-
     @FXML
     public Label statusLabel;
-
     private List<File> fileList;
     private String savePath;
     @FXML
     private ComboBox<File> comboBox;
+    @FXML
+    private Label invisibleLabel;
+    @FXML
+    private ImageView openFileHelpIcon;
+    @FXML
+    private Tooltip toolTipOpenFiles;
+
 
     @FXML
     void initialize() {
@@ -52,8 +49,12 @@ public class Controller {
         assert CloseButton != null : "fx:id=\"CloseButton\" was not injected: check your FXML file 'sample.fxml'.";
         assert SavePathField != null : "fx:id=\"SavePathField\" was not injected: check your FXML file 'sample.fxml'.";
         assert StartButton != null : "fx:id=\"StartButton\" was not injected: check your FXML file 'sample.fxml'.";
+        assert comboBox != null : "fx:id=\"comboBox\" was not injected: check your FXML file 'sample.fxml'.";
+        assert invisibleLabel != null : "fx:id=\"invisibleLabel\" was not injected: check your FXML file 'sample.fxml'.";
+        assert openFileHelpIcon != null : "fx:id=\"openFileHelpIcon\" was not injected: check your FXML file 'sample.fxml'.";
         assert statusLabel != null : "fx:id=\"statusLabel\" was not injected: check your FXML file 'sample.fxml'.";
-        assert comboBox != null : "fx:id=\"ComboBox\" was not injected: check your FXML file 'sample.fxml'.";
+        assert toolTipOpenFiles != null : "fx:id=\"toolTipOpenFiles\" was not injected: check your FXML file 'sample.fxml'.";
+
     }
 
     @FXML
@@ -118,5 +119,20 @@ public class Controller {
                 Platform.runLater(() -> comboBox.setItems(observableList));
             }
         });
+    }
+
+    @FXML
+    private void showOpenFileHelp() {
+        toolTipOpenFiles = new Tooltip(HelpText.OPEN_FILES_TIP.label);
+        Tooltip.install(openFileHelpIcon, toolTipOpenFiles);
+        Bounds bounds = openFileHelpIcon.localToScreen(openFileHelpIcon.getBoundsInLocal());
+        double x = bounds.getMinX() + openFileHelpIcon.getBoundsInLocal().getWidth() + 10;
+        double y = bounds.getMaxY() + 10;
+        toolTipOpenFiles.show(openFileHelpIcon, x, y);
+    }
+
+    @FXML
+    private void hideOpenFileHelp() {
+        if (toolTipOpenFiles != null) toolTipOpenFiles.hide();
     }
 }
