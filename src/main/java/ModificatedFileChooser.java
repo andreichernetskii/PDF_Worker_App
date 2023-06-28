@@ -14,7 +14,7 @@ public class ModificatedFileChooser {
 
     public List<File> showOpenMultipleDialog(Window ovnerWindow) {
         List<File> list = fileChooser.showOpenMultipleDialog(ovnerWindow);
-        return (list != null) ? new ArrayList<>(list) : new ArrayList<>();
+        return new ArrayList<>(list);
     }
 
     public void setTitle(String str) {
