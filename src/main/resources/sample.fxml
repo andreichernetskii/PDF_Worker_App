@@ -30,7 +30,21 @@
                   <Tooltip fx:id="toolTipOpenFiles" text="Empty Tooltip" />
                </tooltip>
             </Label>
-            <ImageView fx:id="openFileHelpIcon" fitHeight="18.0" fitWidth="18.0" onMouseEntered="#showOpenFileHelp" onMouseExited="#hideOpenFileHelp" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="openFileHelpIcon" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@info_icon.png" />
+               </image>
+            </ImageView>
+         </children>
+      </StackPane>
+      <StackPane layoutX="391.0" layoutY="99.0" prefHeight="20.0" prefWidth="20.0">
+         <children>
+            <Label fx:id="invisibleLabel2" prefHeight="16.0" prefWidth="14.0" visible="false">
+               <tooltip>
+                  <Tooltip fx:id="toolTipSaveFile" text="Empty Tooltip" />
+               </tooltip>
+            </Label>
+            <ImageView fx:id="saveFileHelpIcon" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@info_icon.png" />
                </image>

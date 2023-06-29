@@ -37,9 +37,15 @@ public class Controller {
     @FXML
     private Label invisibleLabel;
     @FXML
+    private Label invisibleLabel2;
+    @FXML
     private ImageView openFileHelpIcon;
     @FXML
+    private ImageView saveFileHelpIcon;
+    @FXML
     private Tooltip toolTipOpenFiles;
+    @FXML
+    private Tooltip toolTipSaveFile;
 
 
     @FXML
@@ -55,6 +61,26 @@ public class Controller {
         assert statusLabel != null : "fx:id=\"statusLabel\" was not injected: check your FXML file 'sample.fxml'.";
         assert toolTipOpenFiles != null : "fx:id=\"toolTipOpenFiles\" was not injected: check your FXML file 'sample.fxml'.";
 
+        // EVENTS:
+
+        // Show tip event for open files help icon
+//        openFileHelpIcon.setOnMouseEntered(event -> {
+//            showTip(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
+//        });
+//        openFileHelpIcon.setOnMouseExited(event -> {
+//            hideTip(toolTipOpenFiles);
+//        });
+//
+//        // Show tip event for save file help icon
+//        saveFileHelpIcon.setOnMouseEntered(event -> {
+//            showTip(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
+//        });
+//        saveFileHelpIcon.setOnMouseExited(event -> {
+//            hideTip(toolTipSaveFile);
+//        });
+
+        Events.setEventsMouseEnteredExited(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
+        Events.setEventsMouseEnteredExited(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
     }
 
     @FXML
@@ -109,6 +135,7 @@ public class Controller {
         }
     }
 
+    // тоже перекинуть потом в класс Events
     private void addEvent() {
         comboBox.setOnAction(event -> {
             if (!comboBox.getItems().isEmpty()) {
@@ -121,18 +148,18 @@ public class Controller {
         });
     }
 
-    @FXML
-    private void showOpenFileHelp() {
-        toolTipOpenFiles = new Tooltip(HelpText.OPEN_FILES_TIP.label);
-        Tooltip.install(openFileHelpIcon, toolTipOpenFiles);
-        Bounds bounds = openFileHelpIcon.localToScreen(openFileHelpIcon.getBoundsInLocal());
-        double x = bounds.getMinX() + openFileHelpIcon.getBoundsInLocal().getWidth() + 10;
-        double y = bounds.getMaxY() + 10;
-        toolTipOpenFiles.show(openFileHelpIcon, x, y);
-    }
-
-    @FXML
-    private void hideOpenFileHelp() {
-        if (toolTipOpenFiles != null) toolTipOpenFiles.hide();
-    }
+//    private void showTip(Node node, Tooltip toolTip, String str) {
+//        toolTip = new Tooltip(str);
+//        Tooltip.install(node, toolTip);
+//        Bounds bounds = node.localToScreen(node.getBoundsInLocal());
+//        double x = bounds.getMinX() + node.getBoundsInLocal().getWidth() + 10;
+//        double y = bounds.getMaxY() + 10;
+//        toolTip.show(node, x, y);
+//    }
+//
+//    private void hideTip(Tooltip tooltip) {
+//        if (tooltip != null) {
+//            tooltip.hide();
+//        }
+//    }
 }
