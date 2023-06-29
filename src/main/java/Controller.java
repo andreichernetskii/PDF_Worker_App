@@ -1,9 +1,4 @@
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
@@ -57,30 +52,20 @@ public class Controller {
         assert StartButton != null : "fx:id=\"StartButton\" was not injected: check your FXML file 'sample.fxml'.";
         assert comboBox != null : "fx:id=\"comboBox\" was not injected: check your FXML file 'sample.fxml'.";
         assert invisibleLabel != null : "fx:id=\"invisibleLabel\" was not injected: check your FXML file 'sample.fxml'.";
+        assert invisibleLabel2 != null : "fx:id=\"invisibleLabel2\" was not injected: check your FXML file 'sample.fxml'.";
         assert openFileHelpIcon != null : "fx:id=\"openFileHelpIcon\" was not injected: check your FXML file 'sample.fxml'.";
+        assert saveFileHelpIcon != null : "fx:id=\"saveFileHelpIcon\" was not injected: check your FXML file 'sample.fxml'.";
         assert statusLabel != null : "fx:id=\"statusLabel\" was not injected: check your FXML file 'sample.fxml'.";
         assert toolTipOpenFiles != null : "fx:id=\"toolTipOpenFiles\" was not injected: check your FXML file 'sample.fxml'.";
+        assert toolTipSaveFile != null : "fx:id=\"toolTipSaveFile\" was not injected: check your FXML file 'sample.fxml'.";
+
 
         // EVENTS:
 
         // Show tip event for open files help icon
-//        openFileHelpIcon.setOnMouseEntered(event -> {
-//            showTip(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
-//        });
-//        openFileHelpIcon.setOnMouseExited(event -> {
-//            hideTip(toolTipOpenFiles);
-//        });
-//
-//        // Show tip event for save file help icon
-//        saveFileHelpIcon.setOnMouseEntered(event -> {
-//            showTip(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
-//        });
-//        saveFileHelpIcon.setOnMouseExited(event -> {
-//            hideTip(toolTipSaveFile);
-//        });
-
-        Events.setEventsMouseEnteredExited(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
-        Events.setEventsMouseEnteredExited(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
+        Events.setEventsMouseEnteredExitedForTipShowHide(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
+        // Show tip event for save file help icon
+        Events.setEventsMouseEnteredExitedForTipShowHide(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
     }
 
     @FXML
@@ -89,6 +74,7 @@ public class Controller {
         stage.close();
     }
 
+    // TODO: split this method to few little methods
     @FXML
     private void openFile() {
         Stage stage = (Stage)BrowseFilesButton.getScene().getWindow();
@@ -98,14 +84,17 @@ public class Controller {
             comboBox.getItems().clear();
         }
 
+        // Maybe it will be good to place inside ModificatedFileChooser
         ModificatedFileChooser fileChooser = new ModificatedFileChooser();
         fileChooser.setExtensionFilter("PDF files (*.pdf)", "*.pdf");
         fileChooser.setTitle("Please choose the file(-s)");
+        // and feel the fileList via ModificatedFileChooser  public method
         fileList = fileChooser.showOpenMultipleDialog(stage);
 
         if (fileList != null) {
             comboBox.getItems().addAll(fileList);
-            addEvent();
+            // Delete selected element from combo box and list if they are not null
+            Events.addComboBoxDeleteElementEvent(comboBox, fileList);
         }
     }
 
@@ -134,32 +123,4 @@ public class Controller {
             statusLabel.setVisible(true);
         }
     }
-
-    // тоже перекинуть потом в класс Events
-    private void addEvent() {
-        comboBox.setOnAction(event -> {
-            if (!comboBox.getItems().isEmpty()) {
-                File selectedElement = comboBox.getSelectionModel().getSelectedItem();
-                ObservableList<File> observableList = FXCollections.observableArrayList(comboBox.getItems());
-                observableList.remove(selectedElement);
-                fileList.remove(selectedElement);
-                Platform.runLater(() -> comboBox.setItems(observableList));
-            }
-        });
-    }
-
-//    private void showTip(Node node, Tooltip toolTip, String str) {
-//        toolTip = new Tooltip(str);
-//        Tooltip.install(node, toolTip);
-//        Bounds bounds = node.localToScreen(node.getBoundsInLocal());
-//        double x = bounds.getMinX() + node.getBoundsInLocal().getWidth() + 10;
-//        double y = bounds.getMaxY() + 10;
-//        toolTip.show(node, x, y);
-//    }
-//
-//    private void hideTip(Tooltip tooltip) {
-//        if (tooltip != null) {
-//            tooltip.hide();
-//        }
-//    }
 }
