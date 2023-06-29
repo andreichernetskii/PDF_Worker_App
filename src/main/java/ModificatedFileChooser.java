@@ -12,17 +12,24 @@ public class ModificatedFileChooser {
         fileChooser = new FileChooser();
     }
 
-    public List<File> showOpenMultipleDialog(Window ovnerWindow) {
+    private List<File> showOpenMultipleDialog(Window ovnerWindow) {
         List<File> list = fileChooser.showOpenMultipleDialog(ovnerWindow);
         return new ArrayList<>(list);
     }
 
-    public void setTitle(String str) {
+    private void setTitle(String str) {
         fileChooser.setTitle(str);
     }
 
-    public void setExtensionFilter(String description, String extension) {
+    private void setExtensionFilter(String description, String extension) {
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(description, extension);
         fileChooser.getExtensionFilters().add(extensionFilter);
+    }
+
+    public List<File> createFileListOfFolderFiles(String title, String description, String extension, Window window) {
+        setTitle(title);
+        setExtensionFilter(description, extension);
+        List<File> list = showOpenMultipleDialog(window);
+        return list;
     }
 }

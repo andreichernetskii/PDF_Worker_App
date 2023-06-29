@@ -74,7 +74,6 @@ public class Controller {
         stage.close();
     }
 
-    // TODO: split this method to few little methods
     @FXML
     private void openFile() {
         Stage stage = (Stage)BrowseFilesButton.getScene().getWindow();
@@ -84,12 +83,15 @@ public class Controller {
             comboBox.getItems().clear();
         }
 
-        // Maybe it will be good to place inside ModificatedFileChooser
-        ModificatedFileChooser fileChooser = new ModificatedFileChooser();
-        fileChooser.setExtensionFilter("PDF files (*.pdf)", "*.pdf");
-        fileChooser.setTitle("Please choose the file(-s)");
-        // and feel the fileList via ModificatedFileChooser  public method
-        fileList = fileChooser.showOpenMultipleDialog(stage);
+        // for editing fileList List should be mutable
+        // but original FileChooser's showOpenMultipleDialog returns immutable list
+        // so here the Modification of File Chooser with mutable List
+        fileList = new ModificatedFileChooser().createFileListOfFolderFiles(
+                "Please choose the file(-s)",
+                "PDF files (*.pdf)",
+                "*.pdf",
+                stage
+        );
 
         if (fileList != null) {
             comboBox.getItems().addAll(fileList);
@@ -107,6 +109,7 @@ public class Controller {
         SavePathField.appendText(savePath);
     }
 
+    // TODO: from here should start file size reducing too
     @FXML
     private void startProcess() {
         try {
