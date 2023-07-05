@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller {
+    PDFWorker pdfWorker;
+    private List<File> fileList;
+    private String savePath;
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -25,14 +28,14 @@ public class Controller {
     private TextField SavePathField;
     @FXML
     public Label statusLabel;
-    private List<File> fileList;
-    private String savePath;
     @FXML
     private ComboBox<File> comboBox;
     @FXML
     private Label invisibleLabel;
     @FXML
     private Label invisibleLabel2;
+    @FXML
+    private Label operationTypeLabel;
     @FXML
     private ImageView openFileHelpIcon;
     @FXML
@@ -41,6 +44,10 @@ public class Controller {
     private Tooltip toolTipOpenFiles;
     @FXML
     private Tooltip toolTipSaveFile;
+    @FXML
+    private CheckBox mergeCheckBox;
+    @FXML
+    private CheckBox reduceCheckBox;
 
 
     @FXML
@@ -53,12 +60,14 @@ public class Controller {
         assert comboBox != null : "fx:id=\"comboBox\" was not injected: check your FXML file 'sample.fxml'.";
         assert invisibleLabel != null : "fx:id=\"invisibleLabel\" was not injected: check your FXML file 'sample.fxml'.";
         assert invisibleLabel2 != null : "fx:id=\"invisibleLabel2\" was not injected: check your FXML file 'sample.fxml'.";
+        assert mergeCheckBox != null : "fx:id=\"mergeCheckBox\" was not injected: check your FXML file 'sample.fxml'.";
         assert openFileHelpIcon != null : "fx:id=\"openFileHelpIcon\" was not injected: check your FXML file 'sample.fxml'.";
+        assert operationTypeLabel != null : "fx:id=\"operationTypeLabel\" was not injected: check your FXML file 'sample.fxml'.";
+        assert reduceCheckBox != null : "fx:id=\"reduceCheckBox\" was not injected: check your FXML file 'sample.fxml'.";
         assert saveFileHelpIcon != null : "fx:id=\"saveFileHelpIcon\" was not injected: check your FXML file 'sample.fxml'.";
         assert statusLabel != null : "fx:id=\"statusLabel\" was not injected: check your FXML file 'sample.fxml'.";
         assert toolTipOpenFiles != null : "fx:id=\"toolTipOpenFiles\" was not injected: check your FXML file 'sample.fxml'.";
         assert toolTipSaveFile != null : "fx:id=\"toolTipSaveFile\" was not injected: check your FXML file 'sample.fxml'.";
-
 
         // EVENTS:
 
@@ -110,20 +119,55 @@ public class Controller {
     }
 
     // TODO: from here should start file size reducing too
+    // start process works by this logic:
+    // user can choose what the process he/she need
+    // via select checkbox user can choose:
+    // merge files or reduce size or both
+    // depends on selections startProcess initiate functions
     @FXML
     private void startProcess() {
-        try {
-            if (fileList.size() > 1 ) {
-                PDFWorker pdfWorker = new PDFWorker();
-                pdfWorker.pdfMerge(fileList, savePath, statusLabel);
-            }
-            else {
-                statusLabel.setText("Error. You have selected only one document!");
-                statusLabel.setVisible(true);
-            }
-        } catch (NullPointerException e) {
-            statusLabel.setText("Error. You have nothing selected");
-            statusLabel.setVisible(true);
+        if (!isCheckBoxesSelected()) {
+            setStatusLabelText("Error: You have not chosen the operation type.");
         }
+        if (reduceCheckBox.isSelected()) {
+            setStatusLabelText("Error: Reducing file size function is not available now.");
+        }
+        if (mergeCheckBox.isSelected()) {
+            try {
+                if (savePath != null) {
+                    if (fileList.size() > 1 ) {
+                        pdfWorker = new PDFWorker();
+                        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
+                    }
+                    else {
+                        setStatusLabelText("Error. You have selected only one document!");
+                    }
+                } else {
+                    setStatusLabelText("Error: Choose the save folder.");
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                setStatusLabelText("Error. You have not selected files for operations.");
+            }
+        }
+
+        if (reduceCheckBox.isSelected()) {
+            if (savePath != null) {
+                pdfWorker = new PDFWorker();
+
+            }
+        }
+    }
+
+
+    // TODO: refactor for more flexible using: maybe in arguments(Label... labels)
+    private boolean isCheckBoxesSelected() {
+        return (mergeCheckBox.isSelected()) || (reduceCheckBox.isSelected()) ||
+                ((mergeCheckBox.isSelected()) && (reduceCheckBox.isSelected()));
+    }
+
+    private void setStatusLabelText(String str) {
+        statusLabel.setText(str);
+        statusLabel.setVisible(true);
     }
 }
