@@ -1,22 +1,25 @@
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.util.List;
 
 public class Events {
     public static void setEventsMouseEnteredExitedForTipShowHide(Node node, Tooltip tooltip, String str) {
-        node.setOnMouseEntered(event -> {
-            showTip(node, tooltip, str);
+        node.setOnMouseEntered(new EventHandler<MouseEvent>() { //anonymous class
+            @Override
+            public void handle(MouseEvent event) {
+              showTip(node, tooltip, str);
+            }
         });
-        node.setOnMouseExited(event -> {
-            hideTip(tooltip);
-        });
+        node.setOnMouseExited(event -> hideTip(tooltip));
     }
 
     private static void showTip(Node node, Tooltip toolTip, String str) {
@@ -35,16 +38,15 @@ public class Events {
     }
 
     public static void addComboBoxDeleteElementEvent(ComboBox<File> comboBox, List<File> list) {
-        if ((comboBox != null) && (list != null)) {
-            comboBox.setOnAction(event -> {
-                if (!comboBox.getItems().isEmpty()) {
-                    File selectedElement = comboBox.getSelectionModel().getSelectedItem();
-                    ObservableList<File> observableList = FXCollections.observableArrayList(comboBox.getItems());
-                    observableList.remove(selectedElement);
-                    list.remove(selectedElement);
-                    Platform.runLater(() -> comboBox.setItems(observableList));
-                }
-            });
-        }
+        if ((comboBox == null) || (list == null)) return;
+
+        comboBox.setOnAction(event -> {
+            if (comboBox.getItems().isEmpty()) return;
+            File selectedElement = comboBox.getSelectionModel().getSelectedItem();
+            ObservableList<File> observableList = FXCollections.observableArrayList(comboBox.getItems());
+            observableList.remove(selectedElement);
+            list.remove(selectedElement);
+            Platform.runLater(() -> comboBox.setItems(observableList));
+        });
     }
 }

@@ -3,10 +3,15 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Controller {
     PDFWorker pdfWorker;
@@ -75,6 +80,8 @@ public class Controller {
         Events.setEventsMouseEnteredExitedForTipShowHide(openFileHelpIcon, toolTipOpenFiles, HelpText.OPEN_FILES_TIP.label);
         // Show tip event for save file help icon
         Events.setEventsMouseEnteredExitedForTipShowHide(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
+
+        pdfWorker = new PDFWorker();
     }
 
     @FXML
@@ -85,9 +92,9 @@ public class Controller {
 
     @FXML
     private void openFile() {
-        Stage stage = (Stage)BrowseFilesButton.getScene().getWindow();
+        Stage stage = (Stage) BrowseFilesButton.getScene().getWindow();
 
-        if ( (fileList != null) && (comboBox.getItems() != null) ) {
+        if ((fileList != null) && (comboBox.getItems() != null)) {
             fileList.clear();
             comboBox.getItems().clear();
         }
@@ -111,10 +118,11 @@ public class Controller {
 
     @FXML
     private void saveFilePath() {
-        Stage stage = (Stage)BrowseSavePathButton.getScene().getWindow();
+        Stage stage = (Stage) BrowseSavePathButton.getScene().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Chose directory for saving");
         savePath = directoryChooser.showDialog(stage).getAbsolutePath();
+        if (savePath == null) return;
         SavePathField.appendText(savePath);
     }
 
@@ -124,6 +132,12 @@ public class Controller {
     // via select checkbox user can choose:
     // merge files or reduce size or both
     // depends on selections startProcess initiate functions
+
+    //Merge | Reduce
+    // OK   |  OK -> OK
+    // NO   |  NO -> NO
+    // OK   |  NO -> OK
+    // NO   |  OK -> OK
     @FXML
     private void startProcess() {
         if (!isCheckBoxesSelected()) {
@@ -131,39 +145,26 @@ public class Controller {
         }
         if (reduceCheckBox.isSelected()) {
             setStatusLabelText("Error: Reducing file size function is not available now.");
+            return;
         }
-        if (mergeCheckBox.isSelected()) {
-            try {
-                if (savePath != null) {
-                    if (fileList.size() > 1 ) {
-                        pdfWorker = new PDFWorker();
-                        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
-                    }
-                    else {
-                        setStatusLabelText("Error. You have selected only one document!");
-                    }
-                } else {
-                    setStatusLabelText("Error: Choose the save folder.");
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-                setStatusLabelText("Error. You have not selected files for operations.");
-            }
+        if (savePath == null) {
+            setStatusLabelText("Error: Choose the save folder.");
+            return;
         }
-
-        if (reduceCheckBox.isSelected()) {
-            if (savePath != null) {
-                pdfWorker = new PDFWorker();
-
-            }
+        if (fileList == null){
+            setStatusLabelText("Error. You have not selected files for operations.");
+            return;
         }
+        if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
+            setStatusLabelText("Error. You have selected only one document!");
+            return;
+        }
+        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
     }
 
 
-    // TODO: refactor for more flexible using: maybe in arguments(Label... labels)
     private boolean isCheckBoxesSelected() {
-        return (mergeCheckBox.isSelected()) || (reduceCheckBox.isSelected()) ||
-                ((mergeCheckBox.isSelected()) && (reduceCheckBox.isSelected()));
+        return (mergeCheckBox.isSelected()) && (reduceCheckBox.isSelected());
     }
 
     private void setStatusLabelText(String str) {

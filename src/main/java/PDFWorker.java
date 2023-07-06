@@ -20,7 +20,7 @@ public class PDFWorker {
             pdfMergerUtility.mergeDocuments();
             statusLabel.setText("Done!");
             statusLabel.setVisible(true);
-            callFileManager(fileName);
+//            callFileManager(fileName);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
