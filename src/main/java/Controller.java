@@ -77,7 +77,7 @@ public class Controller {
         // Show tip event for save file help icon
         Events.setEventsMouseEnteredExitedForTipShowHide(saveFileHelpIcon, toolTipSaveFile, HelpText.SAVE_FILE_TIP.label);
 
-        pdfWorker = new PDFWorker();
+
     }
 
     @FXML
@@ -122,17 +122,18 @@ public class Controller {
         SavePathField.appendText(savePath);
     }
 
-    // TODO: from here should start file size reducing too
-    // todo: для сжатия сделать условие, чтобы в списке был только один файл
     // start process works by this logic:
-    // user can choose what the process he/she need
+    // user can choose what the process he/she needed
     // via select checkbox user can choose:
     // merge files or reduce size or both
     // depends on selections startProcess initiate functions
     @FXML
     private void startProcess() {
         if (!isReadyForWork()) return;
-        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
+
+        pdfWorker = new PDFWorker();
+        pdfWorker.startProcess(fileList, savePath, statusLabel, mergeCheckBox.isSelected(), reduceCheckBox.isSelected());
+
     }
 
     private void setStatusLabelText(String str) {
@@ -153,10 +154,6 @@ public class Controller {
         }
         if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
             setStatusLabelText("Error: You have not chosen the operation type.");
-            return false;
-        }
-        if (reduceCheckBox.isSelected()) {
-            setStatusLabelText("Error: Reducing file size function is not available now.");
             return false;
         }
         if (savePath == null) {
