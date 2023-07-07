@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import javafx.application.Application;
 import java.io.IOException;
 
+// todo: сделать еще кнопу readme с инструкциями использования программы с выпадающим отдельным окном
 
 public class Main extends Application {
     public static void main(String[] args) {

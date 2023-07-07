@@ -7,11 +7,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Controller {
     PDFWorker pdfWorker;
@@ -95,7 +91,7 @@ public class Controller {
         Stage stage = (Stage) BrowseFilesButton.getScene().getWindow();
 
         if ((fileList != null) && (comboBox.getItems() != null)) {
-            fileList.clear();
+            fileList = null;
             comboBox.getItems().clear();
         }
 
@@ -122,53 +118,56 @@ public class Controller {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Chose directory for saving");
         savePath = directoryChooser.showDialog(stage).getAbsolutePath();
-        if (savePath == null) return;
+        if (savePath == null || savePath.isEmpty()) return;
         SavePathField.appendText(savePath);
     }
 
     // TODO: from here should start file size reducing too
+    // todo: для сжатия сделать условие, чтобы в списке был только один файл
     // start process works by this logic:
     // user can choose what the process he/she need
     // via select checkbox user can choose:
     // merge files or reduce size or both
     // depends on selections startProcess initiate functions
+    @FXML
+    private void startProcess() {
+        if (!isReadyForWork()) return;
+        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
+    }
+
+    private void setStatusLabelText(String str) {
+        statusLabel.setText(null);
+        statusLabel.setText(str);
+        statusLabel.setVisible(true);
+    }
 
     //Merge | Reduce
     // OK   |  OK -> OK
     // NO   |  NO -> NO
     // OK   |  NO -> OK
     // NO   |  OK -> OK
-    @FXML
-    private void startProcess() {
-        if (!isCheckBoxesSelected()) {
+    private boolean isReadyForWork() {
+        if (fileList == null || fileList.isEmpty() || comboBox.getItems().isEmpty() || comboBox.getItems() == null){
+            setStatusLabelText("Error. You have not selected files for operations.");
+            return false;
+        }
+        if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
             setStatusLabelText("Error: You have not chosen the operation type.");
+            return false;
         }
         if (reduceCheckBox.isSelected()) {
             setStatusLabelText("Error: Reducing file size function is not available now.");
-            return;
+            return false;
         }
         if (savePath == null) {
             setStatusLabelText("Error: Choose the save folder.");
-            return;
-        }
-        if (fileList == null){
-            setStatusLabelText("Error. You have not selected files for operations.");
-            return;
+            return false;
         }
         if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
             setStatusLabelText("Error. You have selected only one document!");
-            return;
+            return false;
         }
-        pdfWorker.pdfMerge(fileList, savePath, statusLabel);
-    }
 
-
-    private boolean isCheckBoxesSelected() {
-        return (mergeCheckBox.isSelected()) && (reduceCheckBox.isSelected());
-    }
-
-    private void setStatusLabelText(String str) {
-        statusLabel.setText(str);
-        statusLabel.setVisible(true);
+        return true;
     }
 }

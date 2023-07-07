@@ -14,6 +14,7 @@ public class PDFWorker {
     public void pdfMerge(List<File> fileList, String savePath, Label statusLabel) {
         String fileName = fileNaming(savePath, "/merged_file", ".pdf");
         PDFMergerUtility pdfMergerUtility = new PDFMergerUtility();
+
         try {
             for (File o : fileList) pdfMergerUtility.addSource(o);
             pdfMergerUtility.setDestinationFileName(fileName);
@@ -40,15 +41,22 @@ public class PDFWorker {
 //
 //    }
 
-    // TODO: make number adding function better
+    // TODO: make adding number to duplicate file name function better
     private String fileNaming(String filePath, String fileName, String fileType) {
+        int counter = 0;
         Path path = Paths.get(filePath + fileName + fileType);
-        if (Files.notExists(path)) return filePath + fileName + fileType;
-        else return fileNaming(filePath, fileName + 1, fileType);
+
+        while(Files.exists(path)) {
+            counter++;
+            path = Paths.get(filePath + fileName + "_" + counter + fileType);
+        }
+
+        return path.toString();
     }
 
     private void callFileManager(String filePath) {
         Desktop desktop = Desktop.getDesktop();
+
         if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
             File file = new File(filePath);
             desktop.browseFileDirectory(file);
