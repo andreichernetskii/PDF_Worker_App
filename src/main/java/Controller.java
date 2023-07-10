@@ -130,16 +130,16 @@ public class Controller {
     // depends on selections startProcess initiate functions
     @FXML
     private void startProcess() {
-        if (!isReadyForWork()) return;
+        ValidationResult result = validateReadyForWork();
+        setStatusLabelText(result.message);
+        if (!result.ok) return;
 
         statusLabel.setText(null);
         pdfWorker = new PDFWorker();
         pdfWorker.startProcess(fileList, savePath, statusLabel, mergeCheckBox.isSelected(), reduceCheckBox.isSelected());
-
     }
 
     private void setStatusLabelText(String str) {
-        statusLabel.setText(null);
         statusLabel.setText(str);
         statusLabel.setVisible(true);
     }
@@ -149,24 +149,27 @@ public class Controller {
     // NO   |  NO -> NO
     // OK   |  NO -> OK
     // NO   |  OK -> OK
-    private boolean isReadyForWork() {
+    private ValidationResult validateReadyForWork() {
+        ValidationResult result = new ValidationResult();
+        result.ok = false;
         if (fileList == null || fileList.isEmpty() || comboBox.getItems().isEmpty() || comboBox.getItems() == null){
-            setStatusLabelText("Error. You have not selected files for operations.");
-            return false;
+            result.message="Error. You have not selected files for operations.";
+        }else if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
+            result.message="Error: You have not chosen the operation type.";
+        }else if (savePath == null) {
+            result.message="Error: Choose the save folder.";
+        }else if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
+            result.message="Error. You have selected only one document!";
+        }else {
+            result.ok = true;
         }
-        if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
-            setStatusLabelText("Error: You have not chosen the operation type.");
-            return false;
-        }
-        if (savePath == null) {
-            setStatusLabelText("Error: Choose the save folder.");
-            return false;
-        }
-        if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
-            setStatusLabelText("Error. You have selected only one document!");
-            return false;
-        }
-
-        return true;
+        return result;
     }
+
+    private class ValidationResult {
+        private boolean ok;
+        private String message = "";
+
+    }
+
 }

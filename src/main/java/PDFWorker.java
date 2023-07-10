@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import javafx.scene.control.Label;
-import java.awt.*;
 
 
 public class PDFWorker {
