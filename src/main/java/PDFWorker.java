@@ -82,17 +82,6 @@ public class PDFWorker {
         return path.toString();
     }
 
-    private void callFileManager(String filePath) {
-        Desktop desktop = Desktop.getDesktop();
-
-        if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-            File file = new File(filePath);
-            desktop.browseFileDirectory(file);
-        } else {
-            System.out.println("Browse file directory action is not supported!");
-        }
-    }
-
     private void setStatusLabelText(Label statusLabel, String str) {
         statusLabel.setText(null);
         statusLabel.setText(str);

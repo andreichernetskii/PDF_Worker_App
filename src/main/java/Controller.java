@@ -89,6 +89,7 @@ public class Controller {
     @FXML
     private void openFile() {
         Stage stage = (Stage) BrowseFilesButton.getScene().getWindow();
+        statusLabel.setText(null);
 
         if ((fileList != null) && (comboBox.getItems() != null)) {
             fileList = null;
@@ -131,6 +132,7 @@ public class Controller {
     private void startProcess() {
         if (!isReadyForWork()) return;
 
+        statusLabel.setText(null);
         pdfWorker = new PDFWorker();
         pdfWorker.startProcess(fileList, savePath, statusLabel, mergeCheckBox.isSelected(), reduceCheckBox.isSelected());
 
