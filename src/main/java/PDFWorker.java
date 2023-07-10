@@ -1,8 +1,6 @@
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.WriterProperties;
+import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.utils.PdfMerger;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,29 +8,40 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
 import javafx.scene.control.Label;
 
-
 public class PDFWorker {
-    public void startProcess(List<File> fileList, String savePath, Label statusLabel, boolean merge, boolean rescale) {
-        if (merge) {
-            pdfMerge(fileList, savePath, statusLabel, false);
-        }
+    private static final String TYPE = ".pdf";
+    private final List<File> fileList;
+    private final String savePath;
+    private final boolean merge;
+    private final boolean rescale;
 
-        if (rescale) {
-            pdfReduceSize(fileList.get(0), savePath, statusLabel);
-        }
+    // dla skrócenia lsity argumentów i ich powtórki
+    public PDFWorker(List<File> fileList, String savePath, boolean merge, boolean rescale) {
+        this.fileList = fileList;
+        this.savePath = savePath;
+        this.merge = merge;
+        this.rescale = rescale;
+    }
 
+    public void startProcess() {
         if (merge && rescale) {
-            pdfMerge(fileList, savePath, statusLabel, true);
+            File merged = pdfMerge();
+            pdfReduceSize(merged);
+        } else if (rescale) {
+            pdfReduceSize(fileList.get(0));
+        } else if (merge) {
+            pdfMerge();
         }
     }
 
-    private void pdfMerge(List<File> fileList, String savePath, Label statusLabel, boolean rescale) {
-        String fileName = fileNaming(savePath, "/merged_file", ".pdf");
+    private File pdfMerge() {
+        String saveFileName = fileNaming(savePath, "/merged_file");
 
         try {
-            PdfDocument mergedDocument = new PdfDocument(new PdfWriter(fileName));
+            PdfDocument mergedDocument = new PdfDocument(new PdfWriter(saveFileName));
             PdfMerger merger = new PdfMerger(mergedDocument);
 
             for (File file : fileList) {
@@ -42,48 +51,34 @@ public class PDFWorker {
             }
 
             mergedDocument.close();
-            setStatusLabelText(statusLabel, "Merging file complete!");
-
-            if (rescale) {
-                pdfReduceSize(new File(fileName), savePath, statusLabel);
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return new File(saveFileName);
     }
 
-    private void pdfReduceSize(File file, String savePath, Label statusLabel) {
+    private void pdfReduceSize(File file) {
         try {
             PdfReader reader = new PdfReader(file);
-            String fileName = fileNaming(savePath, "/rescaled_file", ".pdf");
-            PdfWriter writer = new PdfWriter(fileName, new WriterProperties().setCompressionLevel(8));
-
+            String fileName = fileNaming(savePath, "/rescaled_file");
+            PdfWriter writer = new PdfWriter(fileName, new WriterProperties().setCompressionLevel(CompressionConstants.BEST_COMPRESSION));
             PdfDocument document = new PdfDocument(reader, writer);
             document.close();
-
-            setStatusLabelText(statusLabel, "File resizing complete!");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
-    private String fileNaming(String filePath, String fileName, String fileType) {
+    private String fileNaming(String filePath, String fileName) {
         int counter = 0;
-        Path path = Paths.get(filePath + fileName + fileType);
+        String template = filePath + fileName + "%s" + TYPE;
+        Path path = Paths.get(String.format(template, ""));
 
-        while(Files.exists(path)) {
+        while (Files.exists(path)) {
             counter++;
-            path = Paths.get(filePath + fileName + "_" + counter + fileType);
+            path = Paths.get(String.format(template, "_" + counter));
         }
 
         return path.toString();
-    }
-
-    private void setStatusLabelText(Label statusLabel, String str) {
-        statusLabel.setText(null);
-        statusLabel.setText(str);
-        statusLabel.setVisible(true);
     }
 }

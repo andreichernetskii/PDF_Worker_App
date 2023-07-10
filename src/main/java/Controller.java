@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller {
-    PDFWorker pdfWorker;
+    private PDFWorker pdfWorker;
     private List<File> fileList;
     private String savePath;
     @FXML
@@ -134,9 +134,19 @@ public class Controller {
         setStatusLabelText(result.message);
         if (!result.ok) return;
 
-        statusLabel.setText(null);
-        pdfWorker = new PDFWorker();
-        pdfWorker.startProcess(fileList, savePath, statusLabel, mergeCheckBox.isSelected(), reduceCheckBox.isSelected());
+        // w przypadku Builder
+       /* PdfWorker.builder()
+                .files(fileList)
+                .savePath(savePath)
+                //(...)
+                .build()
+                .startPricess();*/
+
+        boolean merge = mergeCheckBox.isSelected();
+        boolean resize = reduceCheckBox.isSelected();
+        pdfWorker = new PDFWorker(fileList, savePath, merge, resize);
+        pdfWorker.startProcess();
+        setStatusLabelText(merge ? "Merging file complete!" : "File resizing complete!");
     }
 
     private void setStatusLabelText(String str) {
@@ -152,15 +162,15 @@ public class Controller {
     private ValidationResult validateReadyForWork() {
         ValidationResult result = new ValidationResult();
         result.ok = false;
-        if (fileList == null || fileList.isEmpty() || comboBox.getItems().isEmpty() || comboBox.getItems() == null){
-            result.message="Error. You have not selected files for operations.";
-        }else if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
-            result.message="Error: You have not chosen the operation type.";
-        }else if (savePath == null) {
-            result.message="Error: Choose the save folder.";
-        }else if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
-            result.message="Error. You have selected only one document!";
-        }else {
+        if (fileList == null || fileList.isEmpty() || comboBox.getItems().isEmpty() || comboBox.getItems() == null) {
+            result.message = "Error. You have not selected files for operations.";
+        } else if (!mergeCheckBox.isSelected() && !reduceCheckBox.isSelected()) {
+            result.message = "Error: You have not chosen the operation type.";
+        } else if (savePath == null) {
+            result.message = "Error: Choose the save folder.";
+        } else if (fileList.size() == 1 && mergeCheckBox.isSelected()) {
+            result.message = "Error. You have selected only one document!";
+        } else {
             result.ok = true;
         }
         return result;
