@@ -134,14 +134,6 @@ public class Controller {
         setStatusLabelText(result.message);
         if (!result.ok) return;
 
-        // w przypadku Builder
-       /* PdfWorker.builder()
-                .files(fileList)
-                .savePath(savePath)
-                //(...)
-                .build()
-                .startPricess();*/
-
         boolean merge = mergeCheckBox.isSelected();
         boolean resize = reduceCheckBox.isSelected();
         pdfWorker = new PDFWorker(fileList, savePath, merge, resize);
@@ -154,11 +146,6 @@ public class Controller {
         statusLabel.setVisible(true);
     }
 
-    //Merge | Reduce
-    // OK   |  OK -> OK
-    // NO   |  NO -> NO
-    // OK   |  NO -> OK
-    // NO   |  OK -> OK
     private ValidationResult validateReadyForWork() {
         ValidationResult result = new ValidationResult();
         result.ok = false;

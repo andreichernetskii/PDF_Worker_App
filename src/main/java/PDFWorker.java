@@ -18,7 +18,6 @@ public class PDFWorker {
     private final boolean merge;
     private final boolean rescale;
 
-    // dla skrócenia lsity argumentów i ich powtórki
     public PDFWorker(List<File> fileList, String savePath, boolean merge, boolean rescale) {
         this.fileList = fileList;
         this.savePath = savePath;
