@@ -10,3 +10,7 @@ While working there, I wrote several Python scripts to merge each individual pag
 
 ## UI
 ![main](https://github.com/andreichernetskii/PDF_Worker_App/assets/73879364/c74474c9-8467-42c4-9b99-047b8eb904fc)
+
+## How To Use
+1. In JDEs terminal run comand
+  - ``` mvn compile javafx:run ```
