@@ -1,5 +1,4 @@
 # PDF worker application
-***
 
 ## The Genesis
 The inspiration for this application came from my work at the Polish local newspaper 'Czas Ostrzeszowski'. 
