@@ -13,4 +13,4 @@ While working there, I wrote several Python scripts to merge each individual pag
 
 ## How To Use
 1. In JDEs terminal run comand
-  - ``` mvn compile javafx:run ```
+   ``` mvn compile javafx:run ```
